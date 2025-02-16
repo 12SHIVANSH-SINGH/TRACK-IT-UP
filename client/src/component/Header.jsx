@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
+import NavBar from './Navbar'
 function Header() {
   return (
-    <div>Header</div>
+    <div><NavBar/></div>
   )
 }
 

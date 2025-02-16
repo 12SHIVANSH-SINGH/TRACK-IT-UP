@@ -4,7 +4,7 @@ import Header from "./component/Header"
 import Footer from "./component/Footer"
 import { BrowserRouter , Routes , Route } from "react-router-dom"
 import Home from "./pages/Home"
-import Navbar from "./component/NavBar";
+import Navbar from "./component/Header";
 import SignUp from "./pages/SignUp"
 import SignIn from "./pages/SignIn"
 import Contact from "./pages/Contact"
@@ -15,7 +15,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Navbar />
+        <Header />
         <Routes>
           <Route path="/" element={<Home/>}/>
           <Route path="/signup" element={<SignUp/>}/>
