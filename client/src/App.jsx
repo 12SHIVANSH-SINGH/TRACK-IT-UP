@@ -10,6 +10,9 @@ import SignIn from "./pages/SignIn"
 import Contact from "./pages/Contact"
 import About from "./pages/About"
 import Dashboard from "./component/Dashboard"
+import Entry from "./pages/Entry"
+import Chatbot from "./pages/Chatbot"
+import Projections from "./pages/Projections"
 function App() {
   
 
@@ -24,6 +27,9 @@ function App() {
           <Route path="/contact" element={<Contact/>}/>
           <Route path="/about" element={<About/>}/>
           <Route path="/dashboard" element={<Dashboard/>}/>
+          <Route path="/entry" element={<Entry/>}/>
+          <Route path="/chatbot" element={<Chatbot/>}/>
+          <Route path="/projections" element={<Projections/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>
