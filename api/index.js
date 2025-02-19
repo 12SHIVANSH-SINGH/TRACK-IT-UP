@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authRoute from "./routes/auth.route.js";
+import formRoute from "./routes/form.route.js";
 import morgan from "morgan";
 
 const app = express();
