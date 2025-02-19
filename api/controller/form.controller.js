@@ -41,7 +41,7 @@ export const createForm = async (req, res, next) => {
     });
 
     // Update the respective array based on category
-    switch (category.toLowerCase()) { // Use lowercase for case-insensitive comparison
+    switch (category.toLowerCase()) { 
       case "food":
         newForm.food.push(expenseEntry);
         break;
