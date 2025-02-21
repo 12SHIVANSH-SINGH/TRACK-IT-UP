@@ -3,7 +3,7 @@ import { errorHandler } from "../utils/errorHandler.js"; // Ensure you have this
 
 export const createForm = async (req, res, next) => {
   const { amount, category, description, date, tracker } = req.body;
-
+  const userId = req.user.id;
   // Validate required fields
   if (
     !amount ||
@@ -29,6 +29,7 @@ export const createForm = async (req, res, next) => {
 
     // Initialize the new form object
     const newForm = new Form({
+      userId,
       amount,
       category,
       description,
@@ -47,6 +48,7 @@ export const createForm = async (req, res, next) => {
 
 export const getAllDetails = async (req, res, next) => {
   const { startDate, endDate } = req.body;
+  const userId = req.user.id;
 
   if (!startDate || !endDate) {
     return next(errorHandler(400, "Please fill all the required fields"));
@@ -55,9 +57,10 @@ export const getAllDetails = async (req, res, next) => {
   try {
     const expenses = await Form.find({
       // mongoDB aggregation pipeline
+      userId,
       date: {
-        $gte: startDate, // gte -> get greater than or equal to the start date
-        $lte: endDate,
+        $gte: new Date(startDate), // gte -> get greater than or equal to the start date
+        $lte: new Date(endDate),
       }, // lte -> get less than or equal to the end date
     }).sort({ date: -1 });
 
