@@ -33,42 +33,67 @@ export const createForm = async (req, res, next) => {
       category,
       description,
       date: expenseDate,
-      food: [],
-      transport: [],
-      leisure: [],
-      necessary: [],
-      tracker: tracker || false, // Default to false if not provided
+      tracker: tracker || false,
     });
 
-    // Update the respective array based on category
-    switch (category.toLowerCase()) { 
-      case "food":
-        newForm.food.push(expenseEntry);
-        break;
-      case "transport":
-        newForm.transport.push(expenseEntry);
-        break;
-      case "leisure":
-        newForm.leisure.push(expenseEntry);
-        break;
-      default:
-        return next(errorHandler(400, "Invalid category"));
-    }
-
-    // Update the necessary or leisure array based on tracker
-    if (tracker) {
-      newForm.necessary.push(expenseEntry);
-    } else {
-      newForm.leisure.push(expenseEntry);
-    }
-
-    // Save the new form to the database
     await newForm.save();
 
-    // Send success response
     res.status(201).json({ message: "Form submitted successfully", newForm });
   } catch (error) {
-    // Handle errors
+    console.error("Error creating form:", error);
+    return next(error);
+  }
+};
+
+export const getAllDetails = async (req, res, next) => {
+  const { startDate, endDate } = req.body;
+
+  if (!startDate || !endDate) {
+    return next(errorHandler(400, "Please fill all the required fields"));
+  }
+
+  try {
+    const expenses = await Form.find({
+      // mongoDB aggregation pipeline
+      date: {
+        $gte: startDate, // gte -> get greater than or equal to the start date
+        $lte: endDate,
+      }, // lte -> get less than or equal to the end date
+    }).sort({ date: -1 });
+
+    res.status(200).json(expenses);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const categoryWiseExpenseTotal = async (req, res, next) => {
+  const { startDate, endDate } = req.body;
+
+  if (!startDate || !endDate) {
+    return next(errorHandler(400, "Please fill all the required fields"));
+  }
+
+  try {
+    const expenses = await Form.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$category",
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    res.status(200).json(expenses);
+  } catch (error) {
     return next(error);
   }
 };

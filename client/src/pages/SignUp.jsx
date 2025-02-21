@@ -84,7 +84,7 @@ function SignUp() {
                     <div className="text-center mt-1 text-gray-600">
                         Already have an account? 
                         <button 
-                            onClick={() => navigate('/sign-in')} 
+                            onClick={() => navigate('/signin')} 
                             className="text-gray-700 font-semibold ml-1 cursor-pointer hover:underline">
                             Sign In
                         </button>

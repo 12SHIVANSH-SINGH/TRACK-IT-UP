@@ -1,18 +1,18 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
+import { useDispatch , useSelector} from 'react-redux';
+import { signInStart, signInSuccess, signInFailure, signoutSuccess, deleteUserStart, deleteUserSuccess, deleteUserFailure } from '../redux/user/userSlice';
 
 function SignIn() {
     const [formData, setFormData] = useState({});
+    const [showModal, setShowModal] = useState(false); // Modal state
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    const currentUser = useSelector((state) => state.user.currentUser);
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.email || !formData.password) {
@@ -35,6 +35,38 @@ function SignIn() {
         } catch (error) {
             dispatch(signInFailure(error.message));
         }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            const res = await fetch('/api/auth/signout', { method: 'POST' });
+            const data = await res.json();
+            if (!res.ok) {
+                return dispatch(signInFailure(data.message));
+            }
+            dispatch(signoutSuccess());
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleDelete = async () => {
+        console.log("User deleted");
+        try {
+            dispatch(deleteUserStart());
+            const res = await fetch(`/api/auth/delete/${currentUser._id}`, {
+              method: 'DELETE',
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              dispatch(deleteUserFailure(data.message));
+            } else {
+              dispatch(deleteUserSuccess(data));
+            }
+          } catch (error) {
+            dispatch(deleteUserFailure(error.message));
+          } // Replace with actual delete API call
+        setShowModal(false);
     };
 
     return (
@@ -87,16 +119,41 @@ function SignIn() {
                 </form>
             </div>
 
-            {/* Delete & Sign Out Buttons Below the Form */}
+            {/* Delete & Sign Out Buttons */}
             <div className="flex justify-between w-full max-w-96 mt-3">
-                <button className="text-gray-700 font-semibold hover:underline cursor-pointer">
+                <button className="text-gray-700 font-semibold hover:underline cursor-pointer"
+                    onClick={() => setShowModal(true)}> 
                     Delete
                 </button>
 
-                <button className="text-gray-700 font-semibold hover:underline cursor-pointer">
+                <button className="text-gray-700 font-semibold hover:underline cursor-pointer" onClick={handleSignOut}>
                     Sign Out
                 </button>
             </div>
+
+            {/* Modal */}
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center">
+                        <h2 className="text-lg font-semibold text-gray-800">Confirm Deletion</h2>
+                        <p className="text-gray-600 mt-2">Are you sure you want to delete your account? This action cannot be undone.</p>
+                        <div className="flex justify-between mt-4">
+                            <button 
+                                onClick={() => setShowModal(false)}
+                                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleDelete}
+                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                            >
+                                Yes, Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
