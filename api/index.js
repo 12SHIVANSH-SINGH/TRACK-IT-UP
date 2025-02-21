@@ -30,6 +30,7 @@ console.error("Error connecting to MongoDB:", error);
 
 
 app.use("/api/auth" , authRoute);
+app.use("/api/form" , formRoute);
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

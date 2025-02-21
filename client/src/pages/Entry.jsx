@@ -1,7 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import Dashsidebar from "../component/Dashsidebar";
 
 function Entry() {
+  const [formData, setFormData] = useState({
+    amount: "",
+    description: "",
+    date: "",
+    category: "Food",
+    required: false, 
+  });
+
+  function handleChange(e) {
+    const { name, value, type, checked } = e.target;
+    setFormData({ 
+      ...formData, 
+      [name]: type === "checkbox" ? checked : value 
+    });
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    
+    const { amount, description, date, category } = formData;
+    
+    if (!amount || !description || !date || !category) {
+      alert("Please fill all the fields");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/form/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to submit the form");
+      }
+
+      alert("Form submitted successfully!");
+    } catch (error) {
+      console.log(error);
+      alert("Error submitting form");
+    }
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Dashsidebar />
@@ -12,7 +56,7 @@ function Entry() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Enter the details
           </h2>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Amount */}
             <div className="flex flex-col">
               <label htmlFor="amount" className="text-sm font-medium text-gray-700">
@@ -22,8 +66,10 @@ function Entry() {
                 type="number"
                 id="amount"
                 name="amount"
-                required
+                value={formData.amount}
+                onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
+                required
               />
             </div>
 
@@ -36,8 +82,10 @@ function Entry() {
                 type="text"
                 id="description"
                 name="description"
-                required
+                value={formData.description}
+                onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
+                required
               />
             </div>
 
@@ -50,8 +98,10 @@ function Entry() {
                 type="date"
                 id="date"
                 name="date"
-                required
+                value={formData.date}
+                onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
+                required
               />
             </div>
 
@@ -63,8 +113,10 @@ function Entry() {
               <select
                 id="category"
                 name="category"
-                required
+                value={formData.category}
+                onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
+                required
               >
                 <option value="Food">Food</option>
                 <option value="Transport">Transport</option>
@@ -77,6 +129,8 @@ function Entry() {
                 type="checkbox"
                 id="required"
                 name="required"
+                checked={formData.required}
+                onChange={handleChange}
                 className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
               />
               <label htmlFor="required" className="ml-2 text-sm font-medium text-gray-700">
