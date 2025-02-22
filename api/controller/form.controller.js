@@ -71,22 +71,26 @@ export const getAllDetails = async (req, res, next) => {
 };
 
 export const categoryWiseExpenseTotal = async (req, res, next) => {
-  const { startDate, endDate } = req.body;
+  const { startDate, endDate, category } = req.body;
 
   if (!startDate || !endDate) {
     return next(errorHandler(400, "Please fill all the required fields"));
   }
 
   try {
-    const expenses = await Form.aggregate([
-      {
-        $match: {
-          date: {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate),
-          },
-        },
+    let matchStage = {
+      date: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
       },
+    };
+
+    if (category) {
+      matchStage.category = category;
+    }
+
+    const categoryTotals = await Form.aggregate([
+      { $match: matchStage },
       {
         $group: {
           _id: "$category",
@@ -95,8 +99,11 @@ export const categoryWiseExpenseTotal = async (req, res, next) => {
       },
     ]);
 
-    res.status(200).json(expenses);
+    const detailedExpenses = await Form.find(matchStage).select("amount date category description");
+
+    res.status(200).json({ categoryTotals, detailedExpenses });
   } catch (error) {
     return next(error);
   }
 };
+

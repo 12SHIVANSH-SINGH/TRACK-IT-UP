@@ -13,6 +13,8 @@ import Dashboard from "./component/Dashboard"
 import Entry from "./pages/Entry"
 import Chatbot from "./pages/Chatbot"
 import Projections from "./pages/Projections"
+import ExpenseHistory from "./pages/ExpenseHistory"
+import CategoryWise from "./pages/CategoryWise"
 function App() {
   
 
@@ -30,6 +32,8 @@ function App() {
           <Route path="/entry" element={<Entry/>}/>
           <Route path="/chatbot" element={<Chatbot/>}/>
           <Route path="/projections" element={<Projections/>}/>
+          <Route path="/expenseHistory" element={<ExpenseHistory/>}/>
+          <Route path="/categoryWise" element={<CategoryWise/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>

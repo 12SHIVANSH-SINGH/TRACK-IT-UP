@@ -4,7 +4,7 @@ import {verifyToken} from '../utils/verifyToken.js'
 const router = express.Router()
 
 router.post('/create' , verifyToken , createForm);
-router.get('/allDetails' , verifyToken , getAllDetails);
-router.get('/categoryWiseExpenseTotal' , verifyToken , categoryWiseExpenseTotal);
+router.post("/allDetails", verifyToken, getAllDetails);
+router.post('/categoryWiseExpenseTotal' , verifyToken , categoryWiseExpenseTotal);
 
 export default router;
