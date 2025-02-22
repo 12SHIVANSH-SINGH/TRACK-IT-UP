@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const user = useSelector((state) => state.user.currentUser); // Check if user is signed in
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -51,6 +53,7 @@ const Navbar = () => {
           </button>
         </div>
 
+        {/* Desktop Navigation */}
         <div className="hidden md:flex md:items-center md:space-x-6">
           <ul className="flex space-x-6 text-lg items-center">
             {["/", "/about", "/contact"].map((path) => (
@@ -59,7 +62,7 @@ const Navbar = () => {
                   to={path}
                   className={`px-5 py-2 rounded-md transition-all duration-300 text-base relative group ${
                     location.pathname === path
-                      ? "bg-gray-200 font-semibold" // Light grey background for the active page
+                      ? "bg-gray-200 font-semibold"
                       : "hover:text-gray-600"
                   }`}
                 >
@@ -68,14 +71,30 @@ const Navbar = () => {
                 </Link>
               </li>
             ))}
+
+            {user && (
+              <li>
+                <Link
+                  to="/dashboard"
+                  className={`px-5 py-2 rounded-md transition-all duration-300 text-base relative group ${
+                    location.pathname === "/dashboard"
+                      ? "bg-gray-200 font-semibold"
+                      : "hover:text-gray-600"
+                  }`}
+                >
+                  Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              </li>
+            )}
           </ul>
 
           <Link
-            to="/signup"
+            to={user ? "/signin" : "/signup"}
             className="px-5 py-2 bg-black text-white rounded-md transition-all duration-300 hover:bg-gray-800 hover:scale-105 text-base relative overflow-hidden group"
           >
             <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
-            Sign Up
+            {user ? "Sign Out" : "Sign Up"}
           </Link>
         </div>
 
@@ -92,7 +111,7 @@ const Navbar = () => {
                   to={path}
                   className={`px-5 py-2 w-full block rounded-md text-base transition-all duration-300 ${
                     location.pathname === path
-                      ? "bg-gray-200 font-semibold" // Light grey for active page
+                      ? "bg-gray-200 font-semibold"
                       : "hover:text-gray-600"
                   }`}
                   onClick={toggleMenu}
@@ -101,13 +120,30 @@ const Navbar = () => {
                 </Link>
               </li>
             ))}
+
+            {user && (
+              <li className="w-full text-center">
+                <Link
+                  to="/dashboard"
+                  className={`px-5 py-2 w-full block rounded-md text-base transition-all duration-300 ${
+                    location.pathname === "/dashboard"
+                      ? "bg-gray-200 font-semibold"
+                      : "hover:text-gray-600"
+                  }`}
+                  onClick={toggleMenu}
+                >
+                  Dashboard
+                </Link>
+              </li>
+            )}
+
             <li className="w-full text-center">
               <Link
-                to="/signup"
+                to={user ? "/logout" : "/signup"}
                 className="px-5 py-2 w-full block bg-black text-white rounded-md transition-all duration-300 hover:bg-gray-800 hover:scale-105 text-base"
                 onClick={toggleMenu}
               >
-                Sign Up
+                {user ? "Sign Out" : "Sign Up"}
               </Link>
             </li>
           </ul>

@@ -5,10 +5,12 @@ import budget from '../assets/budget.jpg'
 import graph from '../assets/graph.png'
 import graph2 from '../assets/image-27.png'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
 function About() {
 
     const navigate = useNavigate();
+    const user = useSelector((state) => state.user.currentUser);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-6">
@@ -81,12 +83,21 @@ function About() {
 
             {/* Call to Action */}
             <div className="mt-6">
-                <button className="bg-gray-800 text-white px-5 py-2 md:px-6 md:py-3 rounded-md transition duration-300 
-                          hover:bg-gray-900 hover:scale-105 flex items-center gap-2 cursor-pointer"
-                    onClick={() => navigate('/signin')}>
-                    <BiWallet className="text-lg" />
-                    Start Tracking Now
-                </button>
+                {user ? (
+                    <button className="bg-gray-800 text-white px-5 py-2 md:px-6 md:py-3 rounded-md transition duration-300 
+                    hover:bg-gray-900 hover:scale-105 flex items-center gap-2 cursor-pointer"
+                        onClick={() => navigate('/dashboard')}>
+                        <BiWallet className="text-lg" />
+                        Dashboard
+                    </button>
+                ) : (
+                    <button className="bg-gray-800 text-white px-5 py-2 md:px-6 md:py-3 rounded-md transition duration-300 
+                    hover:bg-gray-900 hover:scale-105 flex items-center gap-2 cursor-pointer"
+                        onClick={() => navigate('/signin')}>
+                        <BiWallet className="text-lg" />
+                        Start Tracking Now
+                    </button>
+                )}
             </div>
 
         </div>
