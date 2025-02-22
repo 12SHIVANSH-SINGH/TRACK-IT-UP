@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 function CategoryWise() {
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
@@ -29,7 +39,7 @@ function CategoryWise() {
   }
 
   async function fetchCategoryExpenses() {
-    const today = new Date().toISOString().split("T")[0];
+   
 
     if (!dateRange.startDate || !dateRange.endDate) {
       setError("Please select both start and end dates.");
@@ -41,10 +51,7 @@ function CategoryWise() {
       return;
     }
 
-    if (dateRange.endDate > today) {
-      setError("End date cannot be in the future.");
-      return;
-    }
+    
 
     setLoading(true);
     setError("");
@@ -73,6 +80,12 @@ function CategoryWise() {
     }
   }
 
+  // Transform categoryTotals for the bar chart
+  const chartData = categoryTotals.map((cat) => ({
+    name: cat._id,
+    total: cat.totalAmount,
+  }));
+
   return (
     <div className="max-w-lg mx-auto bg-white p-6 mt-10 shadow-md rounded-lg">
       <h2 className="text-xl font-bold mb-4">Category-Wise Expenses</h2>
@@ -87,7 +100,7 @@ function CategoryWise() {
             value={dateRange.startDate}
             onChange={handleChange}
             className="border rounded p-2"
-            max={dateRange.endDate || new Date().toISOString().split("T")[0]}
+            // max={dateRange.endDate || new Date().toISOString().split("T")[0]}
           />
         </div>
         <div className="flex flex-col">
@@ -99,32 +112,31 @@ function CategoryWise() {
             onChange={handleChange}
             className="border rounded p-2"
             min={dateRange.startDate}
-            max={new Date().toISOString().split("T")[0]}
+            // max={new Date().toISOString().split("T")[0]}
           />
         </div>
       </div>
 
       {/* Category Selection */}
       <div className="mt-4">
-  <label className="text-sm font-medium">Category (Optional)</label>
-  <select
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-    className="border rounded p-2 w-full"
-  >
-    <option value="">All Categories</option>
-    <option value="Food">Food</option>
-    <option value="Transport">Transport</option>
-    {categories.map((cat) =>
-      cat !== "Food" && cat !== "Transport" ? (
-        <option key={cat} value={cat}>
-          {cat}
-        </option>
-      ) : null
-    )}
-  </select>
-</div>
-
+        <label className="text-sm font-medium">Category (Optional)</label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border rounded p-2 w-full"
+        >
+          <option value="">All Categories</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          {categories.map((cat) =>
+            cat !== "Food" && cat !== "Transport" ? (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ) : null
+          )}
+        </select>
+      </div>
 
       {/* Fetch Button */}
       <button
@@ -138,23 +150,28 @@ function CategoryWise() {
       {/* Error Message */}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
-      {/* Category Totals List */}
-      {categoryTotals.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">Category Totals:</h3>
-          <ul className="mt-2 space-y-3">
-            {categoryTotals.map((category) => (
-              <li
-                key={category._id}
-                className="p-4 border rounded-lg bg-gray-50 shadow-md"
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg">₹{category.totalAmount}</span>
-                  <span className="text-sm text-gray-500">{category._id}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
+      {/* Bar Chart for Category Totals */}
+      {chartData.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-4">Expenses by Category</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+              data={chartData}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="total" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 
@@ -164,7 +181,10 @@ function CategoryWise() {
           <h3 className="text-lg font-semibold">Detailed Expenses:</h3>
           <ul className="mt-2 space-y-3">
             {expenses.map((expense) => (
-              <li key={expense._id} className="p-4 border rounded-lg bg-gray-50 shadow-md">
+              <li
+                key={expense._id}
+                className="p-4 border rounded-lg bg-gray-50 shadow-md"
+              >
                 <div className="flex justify-between">
                   <span className="font-bold text-lg">₹{expense.amount}</span>
                   <span className="text-sm text-gray-500">
@@ -173,7 +193,8 @@ function CategoryWise() {
                 </div>
                 <p className="text-gray-700 mt-1">{expense.description}</p>
                 <p className="text-sm text-gray-600">
-                  Category: <span className="font-semibold">{expense.category}</span>
+                  Category:{" "}
+                  <span className="font-semibold">{expense.category}</span>
                 </p>
               </li>
             ))}
