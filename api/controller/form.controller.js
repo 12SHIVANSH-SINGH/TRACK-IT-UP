@@ -107,3 +107,43 @@ export const categoryWiseExpenseTotal = async (req, res, next) => {
   }
 };
 
+export const deleteForm = async (req, res, next) => {
+  const formId = req.params.formId;
+  
+  if(!formId) {
+    return next(errorHandler(400, "Please fill all the required fields"));
+  }
+
+  try {
+    await Form.findByIdAndDelete(formId);
+    res.status(200).json({ message: "Form deleted successfully" });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export const updateForm = async (req, res, next) => {
+  const formId = req.params.formId;
+  if(!formId) {
+    return next(errorHandler(400, "Please fill all the required fields"));
+  }
+  const { amount, category, description, date, tracker } = req.body;
+
+  try {
+    const updatedForm = await Form.findByIdAndUpdate(
+      req.params.formId,  
+    {
+      $set: {
+        amount,
+        category,
+        description,
+        date,
+        tracker,
+      },
+    }, {new: true,})
+
+    res.status(200).json({ message: "Form updated successfully", updatedForm });
+  } catch (error) {
+    return next(error);
+  }
+}
