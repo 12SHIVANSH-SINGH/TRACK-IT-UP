@@ -107,3 +107,17 @@ export const categoryWiseExpenseTotal = async (req, res, next) => {
   }
 };
 
+export const deleteForm = async (req, res, next) => {
+  const formId = req.params.formId;
+  
+  if(!formId) {
+    return next(errorHandler(400, "Please fill all the required fields"));
+  }
+
+  try {
+    await Form.findByIdAndDelete(formId);
+    res.status(200).json({ message: "Form deleted successfully" });
+  } catch (error) {
+    return next(error);
+  }
+}
