@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 
 function CategoryWise() {
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
@@ -39,8 +40,6 @@ function CategoryWise() {
   }
 
   async function fetchCategoryExpenses() {
-   
-
     if (!dateRange.startDate || !dateRange.endDate) {
       setError("Please select both start and end dates.");
       return;
@@ -50,8 +49,6 @@ function CategoryWise() {
       setError("Start date cannot be after end date.");
       return;
     }
-
-    
 
     setLoading(true);
     setError("");
@@ -80,6 +77,24 @@ function CategoryWise() {
     }
   }
 
+  async function handleDelete(expenseId) {
+    try {
+      const res = await fetch(`/api/form/delete/${expenseId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete expense");
+      setExpenses(expenses.filter((expense) => expense._id !== expenseId));
+    } catch (error) {
+      console.error(error);
+      setError("Could not delete expense.");
+    }
+  }
+
+  function handleEdit(expense) {
+    console.log("Editing:", expense);
+    // Implement edit functionality here
+  }
+
   // Transform categoryTotals for the bar chart
   const chartData = categoryTotals.map((cat) => ({
     name: cat._id,
@@ -100,7 +115,6 @@ function CategoryWise() {
             value={dateRange.startDate}
             onChange={handleChange}
             className="border rounded p-2"
-            // max={dateRange.endDate || new Date().toISOString().split("T")[0]}
           />
         </div>
         <div className="flex flex-col">
@@ -112,7 +126,6 @@ function CategoryWise() {
             onChange={handleChange}
             className="border rounded p-2"
             min={dateRange.startDate}
-            // max={new Date().toISOString().split("T")[0]}
           />
         </div>
       </div>
@@ -183,19 +196,34 @@ function CategoryWise() {
             {expenses.map((expense) => (
               <li
                 key={expense._id}
-                className="p-4 border rounded-lg bg-gray-50 shadow-md"
+                className="p-4 border rounded-lg bg-gray-50 shadow-md flex justify-between items-center"
               >
-                <div className="flex justify-between">
-                  <span className="font-bold text-lg">₹{expense.amount}</span>
-                  <span className="text-sm text-gray-500">
-                    {new Date(expense.date).toLocaleDateString()}
-                  </span>
+                <div>
+                  <div className="flex justify-between">
+                    <span className="font-bold text-lg">₹{expense.amount}</span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(expense.date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 mt-1">{expense.description}</p>
+                  <p className="text-sm text-gray-600">
+                    Category:{" "}
+                    <span className="font-semibold">{expense.category}</span>
+                  </p>
                 </div>
-                <p className="text-gray-700 mt-1">{expense.description}</p>
-                <p className="text-sm text-gray-600">
-                  Category:{" "}
-                  <span className="font-semibold">{expense.category}</span>
-                </p>
+                {/* Icons for Edit and Delete */}
+                <div className="flex gap-3">
+                  <AiOutlineEdit
+                    className="text-blue-500 cursor-pointer hover:text-blue-700"
+                    size={20}
+                    onClick={() => handleEdit(expense)}
+                  />
+                  <AiOutlineDelete
+                    className="text-red-500 cursor-pointer hover:text-red-700"
+                    size={20}
+                    onClick={() => handleDelete(expense._id)}
+                  />
+                </div>
               </li>
             ))}
           </ul>
